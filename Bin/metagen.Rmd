@@ -1,0 +1,79 @@
+---
+title: "Meta Genómica"
+author: "César Emiliano Escalona Prado"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library("vegan")
+library("phyloseq")
+library("ggplot2")
+library("dplyr")
+
+```
+
+## 
+Para este ejercicio se empleó la tabla de OTU en formato .biom generados a aprtir de la tarea 8.1
+ Los datos originales corresponden a 24 muestras de suelo rizosférico recolectados en sitios de bosque nativo (N) y mixto (M) de Quercus (Q) y de Juniperus (J)
+ 
+
+```{r cars}
+suelo<-import_biom("../Data/taxonomy.biom") # se importa el archivo .biom y se le llama. 
+```
+
+Una vez generado el objeto los datos del OTU se pasan a binarios, así pues se extrae la información taxonómica y los datos de hospedero y tratamiento .
+
+
+```{r}
+OUT<-as.data.frame(otu_table(suelo))
+OUT<-decostand(OUT, method="pa")#transformaciín a datos bin (presencia ausencia del otu)
+OUT<-otu_table(OUT, taxa_are_rows = TRUE)
+TAX <- tax_table(suelo)#extracción datos tax
+sampledata<- sample_data(suelo)#extracción datos "host" y "treatment"
+physeq<-phyloseq(OUT,TAX,sampledata)#generación de nuevo objeto
+
+physeq # este es el nuevo objeto phyloseq
+colnames(tax_table(physeq))<-c("Domain","Phylum","Class","Order","Famlily","Genus","Species")#redeterminar el nombre dev las columnas de acuerdo al categorias taxonómicas
+
+```
+Una vez generado el nuevo objeto con los datos del otu referidos a presencias y ausencias, se genera un plot_bar de la abundancia de OTUs por phylum en cada hospedador (host) y tratamiento (treatment) 
+```{r}
+
+p<-plot_bar(physeq,"Host",fill = "Phylum")+ geom_bar(aes(color=Phylum,fill=Phylum),stat="identity",position="stack") 
+p + facet_wrap("Treatment") 
+```
+ De igual manera se generó una anova de la riqueza observada ("Observed") por hospedero y tratamiento, junto con un boxplot que permite visualizar la situación de las medias para los datos
+ 
+```{r}
+diversity<-estimate_richness(physeq,measures=c("Observed","Fisher"))
+data<-cbind(sample_data(physeq),diversity)
+
+host<-aov(Observed ~ Treatment + Host, data=data)
+summary.aov(host)
+boxplot(Observed ~ Treatment + Host, data=data)
+
+#No se aprecian diferencias significativas en la diversidad (observada) respecto al tratamiento o al hospedero    
+```
+ 
+De igual forma se generó una  una matriz a partir del coeficiente probabilístico Raup-Crick(que compara el número observado de taxones compartidos con la distribución de coocurrencias en 200 réplicas generadas al azar) y a partir de la misma se generó una ordenación NMDS, y su gráfico correspondiente
+
+```{r}
+raup<-distance(physeq, method="raup")
+raup
+
+NMDS<-ordinate(physeq,method = "NMDS", distnace="raup")
+NMDS
+p<-plot_ordination(physeq,NMDS,color="Host")
+p +facet_wrap("Treatment")+ geom_point(size=3)+ theme_linedraw()
+```
+
+De los resultados obtenidos se generó una prueba de adonis usando la librería "vegan" que se basa en una prueba de anova multivariada basada en disimilitudes
+
+```{r}
+adonis(raup~Host+Treatment,data=data)
+
+#la prueba revela que si existen diferencias significativas en términos de estructura de la comunidad, tanto en función del hospedero como de tratamiento, (diferencias significativas en la diversidad beta)
+```
+
