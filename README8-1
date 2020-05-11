@@ -1,1 +1,2 @@
-
+En el porececamiento de STPK uno parametro importantes está en referencia al filtrado de lecturas según una longitud (pares de bases) establecida, el problema es que establecer éstas longitudes puede ser complejo cuando los pools empleados pesentan lecturas con lecturas de distintas longitudes.
+Cuando se emplean una min lenght de 200 para nustras lecturas permitimos que las lecturas con longitudes menores de 300 fueran incluidas en nuestro estudio, lo cual evita en la perdida de secuencias. 
