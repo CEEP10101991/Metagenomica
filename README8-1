@@ -1,2 +1,13 @@
-En el porececamiento de AMPtk uno parametro importantes está en referencia al filtrado de lecturas según una longitud (pares de bases) establecida, el problema es que establecer éstas longitudes puede ser complejo cuando los pools empleados pesentan lecturas con lecturas de distintas longitudes.
+En éste tutorial hace un ejercico de metagenómica, que se enfoca en el estudio de un conjunto de materiales genéticos,en éste caso de hongos
+ Se ensamblan los reads forward y reverse,se eliminan los primers y secuencias cortas (menores de 200)
+
+Los datos empleados son de ITS2 (hongos) generados por Illumina MiSeq
+
+Las lecturas se ensamblaron forward y reverse y se eliminan los primers y secuencias cortas (menores de 200). En el porececamiento de AMPtk uno parametro importantes está en referencia al filtrado de lecturas según una longitud (pares de bases) establecida, el problema es que establecer éstas longitudes puede ser complejo cuando los pools empleados pesentan lecturas con lecturas de distintas longitudes.
 Cuando se emplean una min lenght de 200 para nustras lecturas permitimos que las lecturas con longitudes menores de 300 fueran incluidas en nuestro estudio, lo cual evita en la perdida de secuencias. 
+Psteriomente se les  filtro por calidad y se agruparon las secuencias en OTUs.
+Para después indexarlas y la base de datos de secuencias de [UNITE] (https://unite.ut.ee/) para asignar la taxonomía de los OTUs
+
+
+
+
